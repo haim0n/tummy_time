@@ -1,8 +1,6 @@
 from __future__ import print_function
 
 import os
-import base64
-import email
 
 import httplib2
 from apiclient import errors
@@ -18,6 +16,9 @@ SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Gmail API Python Quickstart'
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class GmailMessage(object):
     def __init__(self, email_message):
@@ -37,8 +38,7 @@ class GmailMessage(object):
             self.parse_message_header(h)
 
     def __str__(self):
-        return u','.join((self.id, self.subject, self.date)).encode(
-            'utf-8').strip()
+        return ','.join((self.id, self.subject, self.date))
 
 
 class GmailClientApi(object):
@@ -55,8 +55,7 @@ class GmailClientApi(object):
         If nothing has been stored, or if the stored credentials are invalid,
         the OAuth2 flow is completed to obtain the new credentials.
 
-        Returns:
-            Credentials, the obtained credential.
+        :returns: The obtained credential.
         """
         home_dir = os.path.expanduser('~')
         credential_dir = os.path.join(home_dir, '.credentials')
@@ -80,13 +79,12 @@ class GmailClientApi(object):
     def get_message(self, user_id, msg_id):
         """Get a Message with given ID.
 
-        Args:
-          user_id: User's email address. The special value "me"
-          can be used to indicate the authenticated user.
-          msg_id: The ID of the Message required.
+          :param user_id: User's email address. The special value 'me' can be
+          used to indicate the authenticated user.
 
-        Returns:
-          A Message.
+          :param msg_id: The ID of the Message required.
+
+        :returns: A Message.
         """
         try:
             message = self.service.users().messages().get(userId=user_id,
@@ -98,48 +96,18 @@ class GmailClientApi(object):
         except errors.HttpError, error:
             print('An error occurred: %s' % error)
 
-    def get_mime_message(self, user_id, msg_id):
-        """Get a Message and use it to create a MIME Message.
-
-        Args:
-          service: Authorized Gmail API service instance.
-          user_id: User's email address. The special value "me"
-          can be used to indicate the authenticated user.
-          msg_id: The ID of the Message required.
-
-        Returns:
-          A MIME Message, consisting of data from Message.
-        """
-        try:
-            message = self.service.users().messages().get(
-                userId=user_id,
-                id=msg_id,
-                format='raw').execute()
-
-            print('Message snippet: %s' % message['snippet'])
-
-            msg_str = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
-
-            mime_msg = email.message_from_string(msg_str)
-
-            return mime_msg
-        except errors.HttpError, error:
-            print('An error occurred: %s' % error)
-
     def list_messages_matching_query(self, user_id, query=''):
         """List all Messages of the user's mailbox matching the query.
 
-        Args:
-          service: Authorized Gmail API service instance.
-          user_id: User's email address. The special value "me"
+          :param user_id: User's email address. The special value 'me'
           can be used to indicate the authenticated user.
-          query: String used to filter messages returned.
-          Eg.- 'from:user@some_domain.com' for Messages from a particular sender.
+          :param query: String used to filter messages returned.
+          Eg.- 'from:user@some_domain.com' for Messages from a particular
+          sender.
 
-        Returns:
-          List of Messages that match the criteria of the query. Note that the
-          returned list contains Message IDs, you must use get with the
-          appropriate ID to get the details of a Message.
+        :returns: List of Messages that match the criteria of the query.
+        Note that the returned list contains Message IDs, you must use get with
+        the appropriate ID to get the details of a message.
         """
         try:
             response = self.service.users().messages().list(userId=user_id,

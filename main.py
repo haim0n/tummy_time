@@ -1,10 +1,9 @@
+#! /usr/bin/env python
+
 from __future__ import print_function
 
-# from apiclient import discovery
-
 from oauth2client import tools
-
-from gmail_client_api import GmailClientApi
+from tummy_time.gmail_client_api import GmailClientApi
 
 try:
     import argparse
@@ -17,6 +16,7 @@ def print_formatted_msgs(client, msg_id_list):
     for msg_id in msg_id_list:
         msg = client.get_message(user_id='me', msg_id=msg_id)
         print(msg)
+        print(msg.subject)
 
 
 def main():
