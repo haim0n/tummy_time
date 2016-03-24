@@ -76,7 +76,7 @@ class GmailClientApi(object):
             print('Storing credentials to ' + credential_path)
         return credentials
 
-    def get_message(self, user_id, msg_id):
+    def get_message(self, user_id='me', msg_id='None'):
         """Get a Message with given ID.
 
           :param user_id: User's email address. The special value 'me' can be
@@ -96,7 +96,7 @@ class GmailClientApi(object):
         except errors.HttpError, error:
             print('An error occurred: %s' % error)
 
-    def list_messages_matching_query(self, user_id, query=''):
+    def list_messages_matching_query(self, user_id='me', query=''):
         """List all Messages of the user's mailbox matching the query.
 
           :param user_id: User's email address. The special value 'me'

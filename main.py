@@ -12,22 +12,28 @@ except ImportError:
     flags = None
 
 
-def print_formatted_msgs(client, msg_id_list):
-    for msg_id in msg_id_list:
-        msg = client.get_message(user_id='me', msg_id=msg_id)
+def print_formatted_msgs(msg_list):
+    for msg in msg_list:
         print(msg)
-        print(msg.subject)
+
+def get_msg_objects(client):
+    """
+    :param client: gmail client
+    :return: list of GmailMessage objects
+    """
+
+    # a list of [ {"id": "153a833d1dbee17e", "threadId": "153a833d1dbee17e"}]
+    messages = client.list_messages_matching_query(
+        query='to: tlv-food-arrivals')
+    msg_ids = [m['id'] for m in messages]
+
+    return [client.get_message(msg_id=msg_id) for msg_id in msg_ids]
 
 
 def main():
     gclient = GmailClientApi(flags)
-    # a list of [ {"id": "153a833d1dbee17e", "threadId": "153a833d1dbee17e"}]
-    messages = gclient.list_messages_matching_query(
-        user_id='me',
-        query='to: tlv-food-arrivals')
-
-    msg_ids = [m['id'] for m in messages]
-    print_formatted_msgs(gclient, msg_ids)
+    msg_objects = get_msg_objects(gclient)
+    print_formatted_msgs(msg_objects)
 
 if __name__ == '__main__':
     main()
