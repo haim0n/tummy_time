@@ -33,12 +33,12 @@ class GmailMessage(object):
             self.date = hdr['value']
 
     def parse_message_params(self):
-        self.id = self.email_message['id']
+        self.uid = self.email_message['id']
         for h in self.headers:
             self.parse_message_header(h)
 
     def __str__(self):
-        return ','.join((self.id, self.subject, self.date))
+        return ','.join((self.uid, self.subject, str(self.date)))
 
 
 class GmailClientApi(object):
@@ -84,7 +84,7 @@ class GmailClientApi(object):
 
           :param msg_id: The ID of the Message required.
 
-        :returns: A Message.
+        :returns GmailMessage: A message object.
         """
         try:
             message = self.service.users().messages().get(userId=user_id,
@@ -96,7 +96,7 @@ class GmailClientApi(object):
         except errors.HttpError, error:
             print('An error occurred: %s' % error)
 
-    def list_messages_matching_query(self, user_id='me', query=''):
+    def get_messages_matching_query(self, user_id='me', query=''):
         """List all Messages of the user's mailbox matching the query.
 
           :param user_id: User's email address. The special value 'me'

@@ -1,0 +1,61 @@
+#! /usr/bin/env python
+
+from __future__ import print_function
+
+import argparse
+
+import data_utils
+
+
+def get_args():
+    arg_parser = argparse.ArgumentParser(description='Food arrival stats')
+    arg_parser.add_argument('-Z', '--init-db', action="store_true",
+                            default=False)
+    arg_parser.add_argument('-N', '--no-fetch-data', action="store_true")
+    arg_parser.add_argument('-O', '--output-to-file',
+                            type=argparse.FileType('w'))
+
+    return arg_parser.parse_args()
+
+
+def init_db():
+    print('initializing DB')
+    data_utils.Db.purge_db()
+
+
+def dump_db_to_file(db_dicts, f):
+    with f:
+        for dct in db_dicts:
+            line = ','.join((dct['uid'], str(dct['date']), str(dct['data'])))
+            f.write(line + '\n')
+
+
+def fetch_data():
+    print('fetching data')
+    fetcher = data_utils.Fetcher()
+    formatted_data_list = fetcher.get_formatted_data()
+    for data_items in formatted_data_list:
+        for data in data_items:
+            print('fetched {}'.format(data.to_csv()))
+            yield data
+
+
+def main():
+    args = get_args()
+    if args.init_db:
+        init_db()
+
+    if not args.no_fetch_data:
+        db = data_utils.Db()
+        data = fetch_data()
+        for d in data:
+            db.update_food_arrivals_table(uid=d.uid, date=d.date,
+                                          data=d.parsed_data)
+
+    if args.output_to_file:
+        dump_db_to_file(data_utils.Db().get_all_food_arrivals(),
+                        args.output_to_file)
+
+
+if __name__ == '__main__':
+    main()
