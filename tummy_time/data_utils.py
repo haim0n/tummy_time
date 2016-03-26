@@ -162,8 +162,10 @@ class Db(object):
         return self.food_arrivals_table.search(Query().uid == uid)
 
     def update_food_arrivals_table(self, uid, date, data):
-        if self.get_food_arrival_by_id(uid):
-            print('dup uid {}'.format(uid))
+        existing_data_lst = self.get_food_arrival_by_id(uid)
+        if existing_data_lst and any(
+                        e['data'] == data for e in existing_data_lst):
+            print('dup uid:{} data:{}'.format(uid, data))
             return
 
         self.food_arrivals_table.insert(
@@ -171,3 +173,25 @@ class Db(object):
 
     def get_all_food_arrivals(self):
         return self.food_arrivals_table.all()
+
+    def get_all_restaurants(self):
+        all_lines = self.get_all_food_arrivals()
+        for l in all_lines:
+            yield l['data']
+
+    def get_restaurant_data(self, rest_name):
+        rest_q = Query()
+        res = self.food_arrivals_table.search(rest_q.data == rest_name)
+
+        return [self.dump_rest_dct_to_csv(r) for r in res]
+
+
+    def dump_food_arrivals_to_file(self, f):
+        with f:
+            for dct in self.get_all_food_arrivals():
+                line = self.dump_rest_dct_to_csv(dct) + '\n'
+                f.write(line)
+
+    @classmethod
+    def dump_rest_dct_to_csv(cls, dct):
+        return ','.join((dct['uid'], str(dct['date']), str(dct['data'])))

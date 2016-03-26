@@ -9,11 +9,16 @@ import data_utils
 
 def get_args():
     arg_parser = argparse.ArgumentParser(description='Food arrival stats')
-    arg_parser.add_argument('-Z', '--init-db', action="store_true",
+    arg_parser.add_argument('-Z', '--init-db', action='store_true',
                             default=False)
-    arg_parser.add_argument('-N', '--no-fetch-data', action="store_true")
+    arg_parser.add_argument('-N', '--no-fetch-data', action='store_true')
     arg_parser.add_argument('-O', '--output-to-file',
                             type=argparse.FileType('w'))
+
+    arg_parser.add_argument('-L', '--list-all-restaurants',
+                            action='store_true')
+
+    arg_parser.add_argument('-d', '--dump-restaurant-stats')
 
     return arg_parser.parse_args()
 
@@ -21,13 +26,6 @@ def get_args():
 def init_db():
     print('initializing DB')
     data_utils.Db.purge_db()
-
-
-def dump_db_to_file(db_dicts, f):
-    with f:
-        for dct in db_dicts:
-            line = ','.join((dct['uid'], str(dct['date']), str(dct['data'])))
-            f.write(line + '\n')
 
 
 def fetch_data():
@@ -40,21 +38,45 @@ def fetch_data():
             yield data
 
 
+def populate_food_arrivals_data(db):
+    data = fetch_data()
+    for d in data:
+        db.update_food_arrivals_table(uid=d.uid, date=d.date,
+                                      data=d.parsed_data)
+
+
+def output_to_file(f, db):
+    db.dump_food_arrivals_to_file(f)
+
+
+def list_all_restaurants(db):
+    for r in sorted(set(db.get_all_restaurants())):
+        print(r)
+
+
+def dump_restaurant_stats(db, rest_name):
+    for d in db.get_restaurant_data(rest_name):
+        print(d)
+
+
 def main():
     args = get_args()
+
     if args.init_db:
         init_db()
 
+    db = data_utils.Db()
     if not args.no_fetch_data:
-        db = data_utils.Db()
-        data = fetch_data()
-        for d in data:
-            db.update_food_arrivals_table(uid=d.uid, date=d.date,
-                                          data=d.parsed_data)
+        populate_food_arrivals_data(db)
 
     if args.output_to_file:
-        dump_db_to_file(data_utils.Db().get_all_food_arrivals(),
-                        args.output_to_file)
+        output_to_file(args.output_to_file, db)
+
+    if args.list_all_restaurants:
+        list_all_restaurants(db)
+
+    if args.dump_restaurant_stats:
+        dump_restaurant_stats(db, args.dump_restaurant_stats)
 
 
 if __name__ == '__main__':
