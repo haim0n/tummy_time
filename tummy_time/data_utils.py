@@ -46,8 +46,11 @@ def calc_ema(time_list, alpha=EWA_ALPHA):
 
     :returns: time -> the calculated ewa for arrival time.
     """
+    if not time_list:
+        return None
+
     st_list = [time_str_to_seconds(time_list[0])]
-    st = None
+    st = st_list[0]
     for d in time_list[1:]:
         yt = time_str_to_seconds(d)
         st = alpha * yt + (1 - alpha) * st_list[-1]
