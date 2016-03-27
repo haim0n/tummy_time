@@ -20,6 +20,8 @@ DB_FILE = os.path.join(_script_location, 'db.json')
 
 EWA_ALPHA = 0.6
 
+EMAIL_FETCH_QUERY = 'to: tlv-food-arrivals'
+
 
 def is_heb(input_string):
     for c in input_string:
@@ -165,8 +167,7 @@ class Fetcher(object):
     def get_msg_ids(self):
         # a list of [ {"id": "153a833d1dbee17e",
         # "threadId": "153a833d1dbee17e"}]
-        msgs = self.client.get_messages_matching_query(
-            query='to: tlv-food-arrivals')
+        msgs = self.client.get_messages_matching_query(query=EMAIL_FETCH_QUERY)
 
         for m in msgs:
             yield m['id']
