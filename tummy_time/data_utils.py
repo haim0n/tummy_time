@@ -1,6 +1,7 @@
 # coding=utf-8
 import re
 import time
+from datetime import time as dt
 from datetime import datetime
 from datetime import timedelta
 
@@ -12,12 +13,54 @@ import unicodedata
 DB_FILE = 'db.json'
 GMT_OFFSET = 2
 
+EWA_ALPHA = 0.6
+
 
 def is_heb(input_string):
     for c in input_string:
         if c in 'אבגדהוזחטיכלמנסעפצקרשתךםןץ':
             return True
     return False
+
+
+def time_str_to_seconds(time_str):
+    # t = time_str.split(',')[1].split()[-1]
+    t_hr, t_min, t_sec = map(int, time_str.split(':'))
+
+    return t_hr * 3600 + t_min * 60 + t_sec
+
+
+def calc_ema(time_list, alpha=EWA_ALPHA):
+    """Calculates Exponential Moving Average for given time series.
+
+    An exponential moving average (EMA), aka an exponentially
+    weighted moving average (EWMA) is a math function which applies weighting
+    factors which decrease exponentially. The weighting for each older datum
+    decreases exponentially, never reaching zero.
+
+    :param alpha: float -> The coefficient alpha represents the degree of
+    weighting decrease, a constant smoothing factor between 0 and 1. A higher
+    alpha discounts older observations faster.
+
+    :param time_list: list -> list of integeres representing timestamp of
+    arrival.
+
+    :returns: time -> the calculated ewa for arrival time.
+    """
+    st_list = [time_str_to_seconds(time_list[0])]
+    st = None
+    for d in time_list[1:]:
+        yt = time_str_to_seconds(d)
+        st = alpha * yt + (1 - alpha) * st_list[-1]
+        st_list.append(st)
+
+    # print(st_list, st)
+
+    st_hr = int(st / 3600)
+    st_min = int(st % 3600 / 60)
+    st_sec = int(st % 3600 % 60)
+
+    return dt(st_hr, st_min, st_sec)
 
 
 class ParsedData(object):
@@ -178,12 +221,18 @@ class Db(object):
         for l in all_lines:
             yield l['data']
 
-    def get_restaurant_data(self, rest_name):
-        rest_q = Query()
-        rest_lines = self.food_arrivals_table.search(rest_q.data == rest_name)
+    def get_restaurant_data(self, rest_name, sort_by_date=True):
+        """Query the db for all lines containing rest_name.
 
-        for r in rest_lines:
-            yield self.dump_rest_dct_to_csv(r)
+        :param rest_name: string -> name of the restaurant
+        :param sort_by_date: boolean -> should the output be sorted by date
+        :return: list -> list of dictionaries matching the query
+        """
+        res = self.food_arrivals_table.search(Query().data == rest_name)
+        if sort_by_date:
+            res.sort(key=lambda dct: datetime.strptime(dct['date'],
+                                                       "%Y-%m-%d %H:%M:%S"))
+        return res
 
     def dump_food_arrivals_to_file(self, f):
         with f:

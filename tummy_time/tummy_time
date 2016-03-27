@@ -61,8 +61,14 @@ def list_all_restaurants(db):
 
 
 def dump_restaurant_stats(db, rest_name):
-    for d in db.get_restaurant_data(rest_name):
-        print(d)
+    str_times_list = []
+    for dct in db.get_restaurant_data(rest_name):
+        print(db.dump_rest_dct_to_csv(dct))
+        str_times_list.append(dct['date'].split()[-1])
+
+    print('-' * 50)
+    if str_times_list:
+        print('estimation: {}'.format(data_utils.calc_ema(str_times_list)))
 
 
 def main():
