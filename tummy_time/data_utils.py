@@ -1,4 +1,5 @@
 # coding=utf-8
+import os
 import re
 import time
 from datetime import time as dt
@@ -12,7 +13,10 @@ from tinydb import TinyDB
 from tinydb import Query
 import unicodedata
 
-DB_FILE = 'db.json'
+_script_location = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+DB_FILE = os.path.join(_script_location, 'db.json')
 
 EWA_ALPHA = 0.6
 
