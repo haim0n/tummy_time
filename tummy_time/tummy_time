@@ -10,13 +10,19 @@ import data_utils
 def get_args():
     arg_parser = argparse.ArgumentParser(description='Food arrival stats')
     arg_parser.add_argument('-Z', '--init-db', action='store_true',
-                            default=False)
-    arg_parser.add_argument('-N', '--no-fetch-data', action='store_true')
+                            help='purge all local data', default=False)
+
+    arg_parser.add_argument('-F', '--fetch-data', action='store_true',
+                            default=False,
+                            help='fetch data and populate local db with it')
+
     arg_parser.add_argument('-O', '--output-to-file',
-                            type=argparse.FileType('w'))
+                            type=argparse.FileType('w'),
+                            help='dump db contents formatted as csv')
 
     arg_parser.add_argument('-L', '--list-all-restaurants',
-                            action='store_true')
+                            action='store_true',
+                            help='shows a list of restaurants from local db')
 
     arg_parser.add_argument('-d', '--dump-restaurant-stats')
 
@@ -66,7 +72,7 @@ def main():
         init_db()
 
     db = data_utils.Db()
-    if not args.no_fetch_data:
+    if args.fetch_data:
         populate_food_arrivals_data(db)
 
     if args.output_to_file:

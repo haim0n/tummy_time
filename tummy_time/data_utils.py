@@ -144,7 +144,6 @@ class Fetcher(object):
 class Db(object):
     db = None
     food_arrivals_table = None
-    db_tables = ['food_arrivals']
 
     def __init__(self):
         self._load_db()
@@ -181,9 +180,10 @@ class Db(object):
 
     def get_restaurant_data(self, rest_name):
         rest_q = Query()
-        res = self.food_arrivals_table.search(rest_q.data == rest_name)
+        rest_lines = self.food_arrivals_table.search(rest_q.data == rest_name)
 
-        return [self.dump_rest_dct_to_csv(r) for r in res]
+        for r in rest_lines:
+            yield self.dump_rest_dct_to_csv(r)
 
     def dump_food_arrivals_to_file(self, f):
         with f:
