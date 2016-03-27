@@ -1,8 +1,9 @@
+coverage
 google-api-python-client
 oauth2client>=2.0.1
 httplib2
 six
 pytest
-tinydb
-coverage
 pytest-cov
+pytz
+tinydb

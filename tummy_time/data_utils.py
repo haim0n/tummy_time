@@ -5,13 +5,14 @@ from datetime import time as dt
 from datetime import datetime
 from datetime import timedelta
 
+import pytz
+
 from gmail_wrapper_api import GmailClientApi
 from tinydb import TinyDB
 from tinydb import Query
 import unicodedata
 
 DB_FILE = 'db.json'
-GMT_OFFSET = 2
 
 EWA_ALPHA = 0.6
 
@@ -81,21 +82,20 @@ class Parser(object):
 
     def __init__(self, uid, data, creation_time):
         self.uid = uid
-        self.creation_time = self.time_str_to_gmt_daytime(creation_time)
+        self.creation_time = self.time_str_to_gmt_datetime(creation_time)
         self.parsed_data = self.parse(data)
 
     @staticmethod
     def _tz_offset_str_to_hours(tz_offset_str):
-        return -1 * int(tz_offset_str) / 100 + GMT_OFFSET
+        return -1 * int(tz_offset_str) / 100
 
     @classmethod
-    def time_str_to_gmt_daytime(cls, time_str):
+    def time_str_to_gmt_datetime(cls, time_str):
         """Convert time representing string to GMT
 
         :param time_str: string from msg Date header
         :return: datetime for GMT (+0200) representation
         """
-
         # skip the TZ name, if exists
         time_str_list = time_str.rsplit()
         tz = time_str_list[-1]
@@ -108,14 +108,17 @@ class Parser(object):
         time_str = ' '.join(time_str_list)
 
         struct = time.strptime(time_str, '%a, %d %b %Y %H:%M:%S')
-        dt = datetime.fromtimestamp(time.mktime(struct))
+        dtime = datetime.fromtimestamp(time.mktime(struct),
+                                       tz=pytz.timezone('Israel'))
 
-        return dt + timedelta(hours=cls._tz_offset_str_to_hours(tz_offset))
+        res = dtime + timedelta(hours=cls._tz_offset_str_to_hours(tz_offset))
+        return datetime(res.year, res.month, res.day, res.hour, res.minute,
+                        res.second) + res.tzinfo._utcoffset
 
     @classmethod
     def _filter_text_basic(cls, text):
         """
-        :param data: str -> raw input string
+        :param text: str -> raw input string
         :returns: data string with stripped words
         """
         remove_list = (
