@@ -1,3 +1,4 @@
+apiclient
 coverage
 google-api-python-client
 oauth2client>=2.0.1
