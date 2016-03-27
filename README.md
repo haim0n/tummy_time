@@ -1,13 +1,12 @@
 # Tummy Time
-Food arrival stats analyser - say goodbye to guessing when's your next food delivery ETA.
+Food delivery time analyser - say goodbye to guessing when's your next food delivery ETA.
 
 ## Installation
 
 * Clone the repo `git clone git@github.com:haim0n/tummy_time.git`
 * Install pip: `sudo yum install -y python-pip`
 * Install all requirements: `sudo pip install -r tummy_time/requirements.txt`
-* Follow **Step1 only** as described in [Google's Gmail API](https://developers.google.com/gmail/api/quickstart/python#prerequisites).
-* **NOTE**: Download the JSON file from STEP1 to tummy_time/client_secret.json
+* Follow **Step1 only** as described in [Google's Gmail API](https://developers.google.com/gmail/api/quickstart/python#prerequisites).  **NOTE**: Download the JSON file from Step1 to `tummy_time/tummy_time/client_secret.json`
     
 ## Getting Started
 Refer to the utility's help:
