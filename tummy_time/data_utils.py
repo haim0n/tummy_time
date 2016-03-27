@@ -82,7 +82,7 @@ class Parser(object):
 
     def __init__(self, uid, data, creation_time):
         self.uid = uid
-        self.creation_time = self.time_str_to_gmt_datetime(creation_time)
+        self.creation_time = self.time_str_to_israel_datetime(creation_time)
         self.parsed_data = self.parse(data)
 
     @staticmethod
@@ -90,7 +90,7 @@ class Parser(object):
         return -1 * int(tz_offset_str) / 100
 
     @classmethod
-    def time_str_to_gmt_datetime(cls, time_str):
+    def time_str_to_israel_datetime(cls, time_str):
         """Convert time representing string to GMT
 
         :param time_str: string from msg Date header
