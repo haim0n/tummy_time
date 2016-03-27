@@ -185,7 +185,6 @@ class Db(object):
 
         return [self.dump_rest_dct_to_csv(r) for r in res]
 
-
     def dump_food_arrivals_to_file(self, f):
         with f:
             for dct in self.get_all_food_arrivals():
