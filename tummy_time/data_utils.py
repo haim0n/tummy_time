@@ -24,7 +24,6 @@ def is_heb(input_string):
 
 
 def time_str_to_seconds(time_str):
-    # t = time_str.split(',')[1].split()[-1]
     t_hr, t_min, t_sec = map(int, time_str.split(':'))
 
     return t_hr * 3600 + t_min * 60 + t_sec

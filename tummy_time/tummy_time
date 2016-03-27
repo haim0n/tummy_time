@@ -46,6 +46,7 @@ def fetch_data():
 
 def populate_food_arrivals_data(db):
     data = fetch_data()
+    print('updating db')
     for d in data:
         db.update_food_arrivals_table(uid=d.uid, date=d.date,
                                       data=d.parsed_data)
