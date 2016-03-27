@@ -3,14 +3,14 @@
 from setuptools import find_packages
 from setuptools import setup
 
-with open('README.rst') as f:
+with open('README.md') as f:
     readme = f.read()
 
 setup(
     name='tummy-time',
     version='0.0.1',
     description='Get estimates for food delivery time',
-    license = 'Apache Software License',
+    license='Apache Software License',
     long_description=readme,
     author='Haim Daniel',
     author_email='haimdaniel@gmail.com',
