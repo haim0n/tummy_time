@@ -15,17 +15,18 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    # TODO: put package requirements here
+    # TODO(haim0n): put package requirements here
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    # TODO(haim0n): put package test requirements here
 ]
 
 setup(
     name='tummy_time',
     version='0.1.0',
-    description="Food delivery time analyser - say goodbye to guessing when's your next food delivery ETA.",
+    description="Food delivery time analyser - say goodbye to guessing when's "
+                "your next food delivery ETA.",
     long_description=readme + '\n\n' + history,
     author="Haim Daniel",
     author_email='haimdaniel@gmail.com',
