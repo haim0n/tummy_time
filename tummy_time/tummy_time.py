@@ -5,6 +5,9 @@ from __future__ import print_function
 
 import argparse
 
+import db_api
+from tummy_time import data_utils
+
 
 def get_args():
     arg_parser = argparse.ArgumentParser(description='Food arrival stats')
@@ -30,24 +33,24 @@ def get_args():
 
 def init_db():
     print('initializing DB')
-    data_utils.Db.purge_db()
+    db_api.purge_db()
 
 
 def fetch_data():
     print('fetching data')
     fetcher = data_utils.Fetcher()
-    formatted_data_list = fetcher.get_formatted_data()
+    formatted_data_list = fetcher.fetch_data()
     for data_items in formatted_data_list:
         for data in data_items:
             print('fetched {}'.format(data.to_csv()))
             yield data
 
 
-def populate_food_arrivals_data(db):
+def populate_food_arrivals_data():
     data = fetch_data()
     print('updating db')
     for d in data:
-        db.update_food_arrivals_table(uid=d.uid, date=d.date,
+        db_api.update_food_arrivals_table(uid=d.uid, date=d.date,
                                       data=d.parsed_data)
 
 
@@ -75,20 +78,19 @@ def main():
     args = get_args()
 
     if args.init_db:
-        init_db()
+        db_api.purge_db()
 
-    db = data_utils.Db()
     if args.fetch_data:
-        populate_food_arrivals_data(db)
+        populate_food_arrivals_data()
 
     if args.output_to_file:
-        output_to_file(args.output_to_file, db)
+        output_to_file(args.output_to_file, session)
 
     if args.list_all_restaurants:
-        list_all_restaurants(db)
+        list_all_restaurants(session)
 
     if args.dump_restaurant_stats:
-        dump_restaurant_stats(db, args.dump_restaurant_stats)
+        dump_restaurant_stats(session, args.dump_restaurant_stats)
 
 
 if __name__ == '__main__':

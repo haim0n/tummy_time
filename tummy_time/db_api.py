@@ -1,6 +1,7 @@
 import os
 
 import sqlalchemy as sa
+from enum import Enum
 from sqlalchemy.ext.declarative import declarative_base
 
 _script_location = os.path.realpath(
@@ -8,11 +9,11 @@ _script_location = os.path.realpath(
 
 DB_FILE = os.path.join(_script_location, 'data.db')
 
-
-
 Base = declarative_base()
+_session = None
 
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 class RestaurantData(Base):
     __tablename__ = 'restaurant'
     id = sa.Column(sa.String, primary_key=True)
@@ -20,13 +21,33 @@ class RestaurantData(Base):
     subject = sa.Column(sa.Unicode, nullable=False)
 
 
-def create_db_session(engine):
-    engine = sa.create_engine('sqlite:///{}'.format(DB_FILE))
-    db_session = sa.orm.sessionmaker(bind=engine)
+archive_states = {'fetched': 0, 'parsed': 1}
 
-    return db_session()
+
+class ArchivedData(Base):
+    __tablename__ = 'archived_data'
+    id = sa.Column(sa.Integer, primary_key=True)
+    created = sa.Column(sa.DateTime, nullable=False)
+    state = sa.Column(sa.Integer, nullable=False)
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+def _get_db_engine():
+    return sa.create_engine('sqlite:///{}'.format(DB_FILE))
+
+
+def get_db_session():
+    if not _session:
+        global _session
+        db_session = sa.orm.sessionmaker(bind=_get_db_engine())
+        _session = db_session()
+
+    return _session
 
 
 def purge_db():
-    engine = sa.create_engine('sqlite:///{}'.format(DB_FILE))
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(_get_db_engine())
+
+
+def update_food_arrivals_table(uid, date, data):
+    return None
