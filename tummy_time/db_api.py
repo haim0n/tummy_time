@@ -1,7 +1,6 @@
 import os
 
 import sqlalchemy as sa
-from enum import Enum
 from sqlalchemy.ext.declarative import declarative_base
 
 _script_location = os.path.realpath(
