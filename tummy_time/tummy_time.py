@@ -6,7 +6,7 @@ from __future__ import print_function
 import argparse
 
 import db_api
-from tummy_time import data_utils
+import data_utils
 
 
 def get_args():
@@ -17,10 +17,6 @@ def get_args():
     arg_parser.add_argument('-F', '--fetch-data', action='store_true',
                             default=False,
                             help='fetch data and populate local db with it')
-
-    arg_parser.add_argument('-O', '--output-to-file',
-                            type=argparse.FileType('w'),
-                            help='dump db contents formatted as csv')
 
     arg_parser.add_argument('-L', '--list-all-restaurants',
                             action='store_true',
@@ -48,10 +44,10 @@ def fetch_data():
 
 def populate_food_arrivals_data():
     data = fetch_data()
-    print('updating db')
-    for d in data:
-        db_api.update_food_arrivals_table(uid=d.uid, date=d.date,
-                                      data=d.parsed_data)
+    # print('updating db')
+    # for d in data:
+    #     db_api.update_food_arrivals_table(uid=d.uid, date=d.date,
+    #                                   data=d.parsed_data)
 
 
 def output_to_file(f, db):
@@ -82,15 +78,6 @@ def main():
 
     if args.fetch_data:
         populate_food_arrivals_data()
-
-    if args.output_to_file:
-        output_to_file(args.output_to_file, session)
-
-    if args.list_all_restaurants:
-        list_all_restaurants(session)
-
-    if args.dump_restaurant_stats:
-        dump_restaurant_stats(session, args.dump_restaurant_stats)
 
 
 if __name__ == '__main__':

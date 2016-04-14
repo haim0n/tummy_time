@@ -2,50 +2,42 @@ import os
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 _script_location = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 DB_FILE = os.path.join(_script_location, 'data.db')
 
-Base = declarative_base()
-_session = None
-
+_engine = sa.create_engine('sqlite:///{}'.format(DB_FILE))
+Session = sessionmaker(bind=_engine)
+_metadata = sa.schema.MetaData(_engine)
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Base = declarative_base()
+
+
 class RestaurantData(Base):
     __tablename__ = 'restaurant'
-    id = sa.Column(sa.String, primary_key=True)
+    id = sa.Column(sa.String(32), primary_key=True)
     arrival_time = sa.Column(sa.DateTime, nullable=False)
     subject = sa.Column(sa.Unicode, nullable=False)
 
 
-archive_states = {'fetched': 0, 'parsed': 1}
+class MsgData(Base):
+    __tablename__ = 'msg_data'
+    id = sa.Column(sa.String(32), primary_key=True)
+    created_at = sa.Column(sa.DateTime, nullable=False)
+    parsed = sa.Column(sa.Boolean, nullable=False)
+    subject = sa.Column(sa.String, nullable=False)
 
 
-class ArchivedData(Base):
-    __tablename__ = 'archived_data'
-    id = sa.Column(sa.Integer, primary_key=True)
-    created = sa.Column(sa.DateTime, nullable=False)
-    state = sa.Column(sa.Integer, nullable=False)
+_metadata.create_all(_engine)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-def _get_db_engine():
-    return sa.create_engine('sqlite:///{}'.format(DB_FILE))
-
-
-def get_db_session():
-    if not _session:
-        global _session
-        db_session = sa.orm.sessionmaker(bind=_get_db_engine())
-        _session = db_session()
-
-    return _session
-
-
 def purge_db():
-    Base.metadata.create_all(_get_db_engine())
+    _metadata.drop_all()
 
 
 def update_food_arrivals_table(uid, date, data):
