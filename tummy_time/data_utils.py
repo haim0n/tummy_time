@@ -15,10 +15,6 @@ from email.header import decode_header
 
 import pytz
 
-import unicodedata
-
-from sqlalchemy import exists
-
 from tummy_time import db_api
 
 _script_location = os.path.realpath(
@@ -176,7 +172,7 @@ class Fetcher(object):
              self.archive_suffix])
 
     def _get_all_archive_names(self):
-        """:returns: list - list of strings in the form of
+        """:returns: list -> list of strings in the form of
         YYYY-mm.archive_suffix
         """
         return map(self._archive_name_from_date, self._get_all_archive_dates())
@@ -207,7 +203,7 @@ class Fetcher(object):
         url. The latest archive always gets downloaded for potentially holding
         new data.
 
-        :return list: list of downloaded archive file names"""
+        :return list: -> list of downloaded archive file names"""
         today = datetime.now()
         latest_archive = self._archive_name_from_date(
             (today.year, today.month))

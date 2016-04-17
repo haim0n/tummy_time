@@ -11,7 +11,7 @@ import data_utils
 import db_api
 
 ARCHIVES_URL = 'http://post-office.corp.redhat.com/archives/tlv-food-arrivals/'
-FIRST_ARCHIVE = datetime(2016, 4, 1)
+FIRST_ARCHIVE = datetime(2010, 11, 1)
 ARCHIVE_SUFFIX = '.txt.gz'
 
 
