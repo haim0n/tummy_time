@@ -96,6 +96,16 @@ class TestFetcher(unittest.TestCase):
         mock_fetch.assert_called_with({'2016-April.tgz'})
 
 
+class TestParser(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_filter_messages(self):
+	pass
+
 if __name__ == '__main__':
     import sys
 
