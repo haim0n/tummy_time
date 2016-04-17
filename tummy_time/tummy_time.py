@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import argparse
 import gzip
+import string
 from datetime import datetime
 
 import data_utils
@@ -28,6 +29,7 @@ def get_args():
                             action='store_true',
                             help='shows a list of restaurants from local db')
 
+    arg_parser.add_argument('-q', '--query', dest='query')
     arg_parser.add_argument('-d', '--dump-restaurant-stats')
 
     return arg_parser.parse_args()
@@ -64,9 +66,15 @@ def output_to_file(f, db):
     db.dump_food_arrivals_to_file(f)
 
 
-def list_all_restaurants(db):
-    for r in sorted(set(db.get_all_restaurants())):
-        print(r)
+def list_all_restaurants():
+    for r in db_api.list_all_subjects():
+        print(r.subject)
+
+
+def query_restaurants(query):
+    enc = unicode(query, 'utf8')
+    for r in db_api.filter_rest_subject(enc):
+        print(r.subject, r.arrival_time)
 
 
 def dump_restaurant_stats(db, rest_name):
@@ -89,6 +97,11 @@ def main():
     if args.fetch_data:
         populate_food_arrivals_data()
 
+    if args.list_all_restaurants:
+        list_all_restaurants()
+
+    if args.query:
+        query_restaurants(args.query)
 
 if __name__ == '__main__':
     main()

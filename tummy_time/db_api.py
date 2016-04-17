@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 import sqlalchemy as sa
@@ -34,3 +35,13 @@ def purge_db():
 
 def update_food_arrivals_table(uid, date, data):
     return None
+
+
+def filter_rest_subject(subj):
+    session = Session()
+    return session.query(Restaurant).filter(
+        Restaurant.subject.contains(subj)).all()
+
+
+def list_all_subjects():
+    pass
