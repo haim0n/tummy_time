@@ -7,10 +7,11 @@ test_tummy_time
 
 Tests for `tummy_time` module.
 """
-import unittest
 from datetime import datetime
-from freezegun import freeze_time
 import mock
+import unittest
+
+from freezegun import freeze_time
 
 from tummy_time import data_utils
 

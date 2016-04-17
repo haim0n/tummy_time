@@ -7,7 +7,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -15,7 +14,8 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'sqlalchemy', 'freezegun', 'mock',# TODO(haim0n): put package requirements here
+    'sqlalchemy', 'freezegun', 'mock',
+    # TODO(haim0n): put package requirements here
 ]
 
 test_requirements = [
@@ -34,8 +34,7 @@ setup(
     packages=[
         'tummy_time',
     ],
-    package_dir={'tummy_time':
-                 'tummy_time'},
+    package_dir={'tummy_time': 'tummy_time'},
     include_package_data=True,
     install_requires=requirements,
     license="ISCL",

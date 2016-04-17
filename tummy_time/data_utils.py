@@ -163,9 +163,7 @@ class Fetcher(object):
             os.makedirs(self.archive_dir)
 
     def _get_all_archive_dates(self):
-        """
-
-        :returns: set - set of tuples (year, month) each tuple representing
+        """:returns: set - set of tuples (year, month) each tuple representing
         archives dates.
         """
         start_month = self.first_archive_date.month
@@ -195,9 +193,8 @@ class Fetcher(object):
              self.archive_suffix])
 
     def get_all_archive_names(self):
-        """
-
-        :returns: list - list of strings in the form of YYYY-mm.archive_suffix
+        """:returns: list - list of strings in the form of
+        YYYY-mm.archive_suffix
         """
         return map(self._archive_name_from_date, self._get_all_archive_dates())
 

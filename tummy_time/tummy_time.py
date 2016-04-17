@@ -6,8 +6,9 @@ from __future__ import print_function
 import argparse
 from datetime import datetime
 
-import db_api
 import data_utils
+import db_api
+
 
 ARCHIVES_URL = 'http://post-office.corp.redhat.com/archives/tlv-food-arrivals/'
 FIRST_ARCHIVE = datetime(2010, 11, 1)
