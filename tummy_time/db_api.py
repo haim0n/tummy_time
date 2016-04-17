@@ -19,20 +19,12 @@ Base = declarative_base()
 
 class Restaurant(Base):
     __tablename__ = 'restaurants'
-    id = sa.Column(sa.String(32), primary_key=True)
+    id = sa.Column(sa.String(128), primary_key=True)
     arrival_time = sa.Column(sa.DateTime, nullable=False)
     subject = sa.Column(sa.Unicode, nullable=False)
 
 
-class MsgArchive(Base):
-    __tablename__ = 'msg_archives'
-    id = sa.Column(sa.String(32), primary_key=True)
-    created_at = sa.Column(sa.DateTime, nullable=False)
-    parsed = sa.Column(sa.Boolean, nullable=False)
-    subject = sa.Column(sa.String, nullable=False)
-
-
-_metadata.create_all(_engine)
+Base.metadata.create_all(_engine)
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

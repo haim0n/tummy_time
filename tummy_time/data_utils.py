@@ -1,5 +1,6 @@
 # coding=utf-8
 import calendar
+import email
 import os
 import re
 import time
@@ -10,10 +11,13 @@ from datetime import timedelta
 
 import itertools
 import glob
+from email.header import decode_header
 
 import pytz
 
 import unicodedata
+
+from sqlalchemy import exists
 
 from tummy_time import db_api
 
@@ -65,20 +69,11 @@ def calc_ema(time_list, alpha=EWA_ALPHA):
     return dt(st_hr, st_min, st_sec)
 
 
-class ParsedData(object):
-    def __init__(self, uid, data, date):
-        self.uid = uid
-        self.date = date
-        self.parsed_data = data
-
-    def to_csv(self):
-        return ','.join(
-            (self.uid, str(self.date), str(self.parsed_data)))
-
-
 class Parser(object):
     tz_re = re.compile("\(([A-Z]+)\)")
 
+    def __init__(self):
+        self.session = db_api.Session()
 
     @staticmethod
     def _tz_offset_str_to_hours(tz_offset_str):
@@ -114,25 +109,36 @@ class Parser(object):
     def _filter_messages(cls, text):
         """
         :param text: str -> raw input string
-        :returns: list -> email texts with headers
+        :returns: list -> email objects
         """
         regex = re.compile('^From .', flags=re.DOTALL | re.MULTILINE)
 
-        out = re.split(regex, text)
-        return out[1:]
+        msg_texts = re.split(regex, text)[1:]
+        return [email.message_from_string(''.join(['From ', txt])) for txt in
+                msg_texts]
 
-    @classmethod
-    def parse(cls, data):
-        lst = cls._filter_messages(data)
-
-        return lst
+    def parse(self, data):
+        msg_list = self._filter_messages(data)
+        for msg in msg_list:
+            msg_id = msg.get('Message-ID')
+            tbl = db_api.Restaurant
+            if self.session.query(exists().where(tbl.id == msg.get('id'))):
+                print('dup msg_id: {}'.format(msg_id))
+                continue
+            arr_time = self.time_str_to_israel_datetime(msg.get('Date'))
+            dh = decode_header(msg.get('Subject'))
+            subj = ''.join([unicode(t[0], t[1] or 'ASCII') for t in dh])
+            rest = tbl(id=msg_id, arrival_time=arr_time, subject=subj)
+            self.session.add(rest)
+            print('added {}'.format(msg_id))
+        self.session.commit()
+        return msg_list
 
 
 class Fetcher(object):
     def __init__(self, url, first_archive_date, archive_suffix,
                  archive_dir=os.path.join(_script_location, 'archives')):
         self.url = url
-        self.session = db_api.Session()
         self.first_archive_date = first_archive_date
         self.archive_suffix = archive_suffix
         self.archive_dir = archive_dir
@@ -210,3 +216,7 @@ class Fetcher(object):
             fetched_archives) | {latest_archive}
 
         return self.fetch_archives(archives_to_fetch)
+
+    def purge_data(self):
+        if os.path.exists(self.archive_dir):
+            os.rmdir(self.archive_dir)
