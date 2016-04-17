@@ -43,7 +43,7 @@ class TestFetcher(unittest.TestCase):
     @freeze_time("2016-04-01")
     def test_get_all_archive_names(self):
         fetcher = self._test_get_all_archives()
-        out = fetcher.get_all_archive_names()
+        out = fetcher._get_all_archive_names()
         expected = ['2015-October.txt.gz', '2015-November.txt.gz',
                     '2015-December.txt.gz', '2016-January.txt.gz',
                     '2016-February.txt.gz', '2016-March.txt.gz',
@@ -58,7 +58,7 @@ class TestFetcher(unittest.TestCase):
                                      archive_suffix=suffix,
                                      archive_dir=archive_dir)
         with mock.patch('glob.glob') as mock_glob:
-            fetcher.get_fetched_archives()
+            fetcher._get_fetched_archives()
             mock_glob.assert_called_with(archive_dir + '/*' + suffix)
 
     def test_fetch_archives(self):
@@ -71,7 +71,7 @@ class TestFetcher(unittest.TestCase):
             with mock.patch('tummy_time.data_utils.open', mock.mock_open(),
                             create=True):
                 dummy_archives = ['dummy1', 'dummy2']
-                fetcher.fetch_archives(dummy_archives)
+                fetcher._fetch_archives(dummy_archives)
                 for archive in dummy_archives:
                     remote_archive = self.dummy_url + '/' + archive
                     mock_retrieve.assert_any_call(remote_archive)
@@ -82,16 +82,16 @@ class TestFetcher(unittest.TestCase):
                                      first_archive_date=datetime(2015, 12, 1),
                                      archive_suffix='.tgz',
                                      archive_dir='/tmp')
-        fetcher.get_fetched_archives = mock.Mock(return_value=[])
+        fetcher._get_fetched_archives = mock.Mock(return_value=[])
         mock_fetch = mock.Mock()
-        fetcher.fetch_archives = mock_fetch
+        fetcher._fetch_archives = mock_fetch
         fetcher.fetch()
         expected = {'2016-April.tgz', '2016-February.tgz', '2016-January.tgz',
                     '2015-December.tgz', '2016-March.tgz'}
         mock_fetch.assert_called_once_with(expected)
 
         # if all archives exist, fetch only the latest
-        fetcher.get_fetched_archives = mock.Mock(return_value=expected)
+        fetcher._get_fetched_archives = mock.Mock(return_value=expected)
         fetcher.fetch()
         mock_fetch.assert_called_with({'2016-April.tgz'})
 

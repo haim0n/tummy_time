@@ -122,7 +122,7 @@ class Parser(object):
         for msg in msg_list:
             msg_id = msg.get('Message-ID')
             tbl = db_api.Restaurant
-            if self.session.query(exists().where(tbl.id == msg.get('id'))):
+            if self.session.query(tbl).filter(tbl.id == msg_id).first():
                 print('dup msg_id: {}'.format(msg_id))
                 continue
             arr_time = self.time_str_to_israel_datetime(msg.get('Date'))
@@ -130,8 +130,8 @@ class Parser(object):
             subj = ''.join([unicode(t[0], t[1] or 'ASCII') for t in dh])
             rest = tbl(id=msg_id, arrival_time=arr_time, subject=subj)
             self.session.add(rest)
-            print('added {}'.format(msg_id))
-        self.session.commit()
+            self.session.commit()
+            print('added {} {}'.format(msg_id, arr_time))
         return msg_list
 
 
@@ -175,13 +175,13 @@ class Fetcher(object):
             [str(date_tuple[0]), '-', calendar.month_name[date_tuple[1]],
              self.archive_suffix])
 
-    def get_all_archive_names(self):
+    def _get_all_archive_names(self):
         """:returns: list - list of strings in the form of
         YYYY-mm.archive_suffix
         """
         return map(self._archive_name_from_date, self._get_all_archive_dates())
 
-    def fetch_archives(self, archives_to_fetch):
+    def _fetch_archives(self, archives_to_fetch):
         fetched_list = []
         for archive in archives_to_fetch:
             try:
@@ -198,7 +198,7 @@ class Fetcher(object):
         return [os.path.join(self.archive_dir, archive) for archive in
                 fetched_list]
 
-    def get_fetched_archives(self):
+    def _get_fetched_archives(self):
         return [a.split('/')[-1] for a in
                 glob.glob(self.archive_dir + '/*' + self.archive_suffix)]
 
@@ -211,11 +211,11 @@ class Fetcher(object):
         today = datetime.now()
         latest_archive = self._archive_name_from_date(
             (today.year, today.month))
-        fetched_archives = self.get_fetched_archives()
-        archives_to_fetch = set(self.get_all_archive_names()) - set(
+        fetched_archives = self._get_fetched_archives()
+        archives_to_fetch = set(self._get_all_archive_names()) - set(
             fetched_archives) | {latest_archive}
 
-        return self.fetch_archives(archives_to_fetch)
+        return self._fetch_archives(archives_to_fetch)
 
     def purge_data(self):
         if os.path.exists(self.archive_dir):
