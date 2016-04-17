@@ -1,16 +1,24 @@
 # coding=utf-8
+import calendar
 import os
 import re
 import time
+import urllib2
 from datetime import time as dt
 from datetime import datetime
 from datetime import timedelta
+
+import itertools
+import glob
 
 import pytz
 
 import unicodedata
 
 from tummy_time import db_api
+
+_script_location = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 EWA_ALPHA = 0.7
 
@@ -131,8 +139,6 @@ class Parser(object):
 
     @classmethod
     def parse(cls, data):
-        if is_heb(data):
-            return []
         data = unicodedata.normalize('NFKD', data).encode('ascii', 'ignore')
         data = cls._filter_text_basic(data)
         lst = cls._filter_multiple_entries(data)
@@ -145,38 +151,87 @@ class Parser(object):
         return out
 
 
-class DataArchive(object):
-    def __init__(self, filename):
-        self.filename = filename
-
-    def extract(self):
-        pass
-
-
 class Fetcher(object):
-    def __init__(self):
-        self.session = db_api.get_db_session()
+    def __init__(self, url, first_archive_date, archive_suffix,
+                 archive_dir=os.path.join(_script_location, 'archives')):
+        self.url = url
+        self.session = db_api.Session()
+        self.first_archive_date = first_archive_date
+        self.archive_suffix = archive_suffix
+        self.archive_dir = archive_dir
+        if not os.path.exists(self.archive_dir):
+            os.makedirs(self.archive_dir)
 
-    @classmethod
-    def format_msg_data(cls, msg):
-        """Extracts data from msg and wraps in ParsedData.
-
-        :param msg: GmailMessage.
-        :returns list: list of ParsedData objects per item in msg.
+    def _get_all_archive_dates(self):
         """
-        parser = Parser(msg.uid, msg.subject, msg.date)
 
-        return parser.get_parsed_data()
+        :returns: set - set of tuples (year, month) each tuple representing
+        archives dates.
+        """
+        start_month = self.first_archive_date.month
+        start_year = self.first_archive_date.year
+        today = datetime.now()
+        all_dates = itertools.product(range(start_year, today.year + 1),
+                                      range(1, 13))
+        dates_to_remove = []
+        months_to_remove = range(1, start_month)
+        if months_to_remove:
+            dates_to_remove = list(
+                itertools.product([start_year], months_to_remove))
 
-    def fetch_data(self):
-        """:return list: list of ParsedData objects """
+        months_to_remove = []
+        if today.month < 12:
+            months_to_remove = range(today.month + 1, 13)
+        if months_to_remove:
+            dates_to_remove += list(itertools.product([today.year],
+                                                      months_to_remove))
 
-        archives = self.fetch_archives()
-        for archive in archives:
-            archive.extract()
-            yield self.format_msg_data(msg)
+        dates = set(all_dates) - set(dates_to_remove)
+        return dates
 
-    def fetch_archives(self):
-        with self.session:
-            pass
+    def _archive_name_from_date(self, date_tuple):
+        return ''.join(
+            [str(date_tuple[0]), '-', calendar.month_name[date_tuple[1]],
+             self.archive_suffix])
 
+    def get_all_archive_names(self):
+        """
+
+        :returns: list - list of strings in the form of YYYY-mm.archive_suffix
+        """
+        return map(self._archive_name_from_date, self._get_all_archive_dates())
+
+    def fetch_archives(self, archives_to_fetch):
+        fetched_list = []
+        for archive in archives_to_fetch:
+            try:
+                remote_archive = self.url + '/' + archive
+                local_archive = os.path.join(self.archive_dir, archive)
+                fetched = urllib2.urlopen(remote_archive)
+                with open(local_archive, 'wb') as outf:
+                    outf.write(fetched.read())
+                print('fetched {}'.format(archive))
+                fetched_list.append(archive)
+            except urllib2.HTTPError as e:
+                print('error fetching {}: {}'.format(archive, e))
+
+        return fetched_list
+
+    def get_fetched_archives(self):
+        return [a.split('/')[-1] for a in
+                glob.glob(self.archive_dir + '/*' + self.archive_suffix)]
+
+    def fetch(self):
+        """Fetches all available archives that don't exist locally from remote
+        url. The latest archive always gets downloaded for potentially holding
+        new data.
+
+        :return list: list of downloaded archive file names"""
+        today = datetime.now()
+        latest_archive = self._archive_name_from_date(
+            (today.year, today.month))
+        fetched_archives = self.get_fetched_archives()
+        archives_to_fetch = set(self.get_all_archive_names()) - set(
+            fetched_archives) | {latest_archive}
+
+        return self.fetch_archives(archives_to_fetch)

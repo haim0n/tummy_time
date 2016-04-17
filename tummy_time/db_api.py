@@ -17,15 +17,15 @@ _metadata = sa.schema.MetaData(_engine)
 Base = declarative_base()
 
 
-class RestaurantData(Base):
-    __tablename__ = 'restaurant'
+class Restaurant(Base):
+    __tablename__ = 'restaurants'
     id = sa.Column(sa.String(32), primary_key=True)
     arrival_time = sa.Column(sa.DateTime, nullable=False)
     subject = sa.Column(sa.Unicode, nullable=False)
 
 
-class MsgData(Base):
-    __tablename__ = 'msg_data'
+class MsgArchive(Base):
+    __tablename__ = 'msg_archives'
     id = sa.Column(sa.String(32), primary_key=True)
     created_at = sa.Column(sa.DateTime, nullable=False)
     parsed = sa.Column(sa.Boolean, nullable=False)

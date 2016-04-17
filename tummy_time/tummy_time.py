@@ -4,9 +4,14 @@
 from __future__ import print_function
 
 import argparse
+from datetime import datetime
 
 import db_api
 import data_utils
+
+ARCHIVES_URL = 'http://post-office.corp.redhat.com/archives/tlv-food-arrivals/'
+FIRST_ARCHIVE = datetime(2010, 11, 1)
+ARCHIVE_SUFFIX = '.txt.gz'
 
 
 def get_args():
@@ -34,20 +39,14 @@ def init_db():
 
 def fetch_data():
     print('fetching data')
-    fetcher = data_utils.Fetcher()
-    formatted_data_list = fetcher.fetch_data()
-    for data_items in formatted_data_list:
-        for data in data_items:
-            print('fetched {}'.format(data.to_csv()))
-            yield data
+    fetcher = data_utils.Fetcher(url=ARCHIVES_URL,
+                                 first_archive_date=FIRST_ARCHIVE,
+                                 archive_suffix=ARCHIVE_SUFFIX)
+    archives = fetcher.fetch()
 
 
 def populate_food_arrivals_data():
     data = fetch_data()
-    # print('updating db')
-    # for d in data:
-    #     db_api.update_food_arrivals_table(uid=d.uid, date=d.date,
-    #                                   data=d.parsed_data)
 
 
 def output_to_file(f, db):

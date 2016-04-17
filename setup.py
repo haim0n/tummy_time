@@ -15,7 +15,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'sqlalchemy',# TODO(haim0n): put package requirements here
+    'sqlalchemy', 'freezegun', 'mock',# TODO(haim0n): put package requirements here
 ]
 
 test_requirements = [
