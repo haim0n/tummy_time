@@ -79,10 +79,6 @@ class ParsedData(object):
 class Parser(object):
     tz_re = re.compile("\(([A-Z]+)\)")
 
-    def __init__(self, uid, data, creation_time):
-        self.uid = uid
-        self.creation_time = self.time_str_to_israel_datetime(creation_time)
-        self.parsed_data = self.parse(data)
 
     @staticmethod
     def _tz_offset_str_to_hours(tz_offset_str):
@@ -115,40 +111,21 @@ class Parser(object):
                         res.second) + res.tzinfo._utcoffset
 
     @classmethod
-    def _filter_text_basic(cls, text):
+    def _filter_messages(cls, text):
         """
         :param text: str -> raw input string
-        :returns: data string with stripped words
+        :returns: list -> email texts with headers
         """
-        remove_list = (
-            'luch', 'lunch', 'from', 'the', 'has', 'arrived', 'are here',
-            'food deliveries')
+        regex = re.compile('^From .', flags=re.DOTALL | re.MULTILINE)
 
-        remove = '|'.join(remove_list)
-        regex = re.compile(r'\b(' + remove + r')\b', flags=re.IGNORECASE)
-
-        out = regex.sub('', text).strip().lower().rstrip('.')
-        return out
-
-    @classmethod
-    def _filter_multiple_entries(cls, text):
-        text = re.sub(r'and\b', ',', text)
-        lst = text.split(',')
-
-        return map(str.strip, lst)
+        out = re.split(regex, text)
+        return out[1:]
 
     @classmethod
     def parse(cls, data):
-        data = unicodedata.normalize('NFKD', data).encode('ascii', 'ignore')
-        data = cls._filter_text_basic(data)
-        lst = cls._filter_multiple_entries(data)
+        lst = cls._filter_messages(data)
 
         return lst
-
-    def get_parsed_data(self):
-        out = [ParsedData(self.uid, str(d), str(self.creation_time)) for d in
-               self.parsed_data]
-        return out
 
 
 class Fetcher(object):
@@ -212,7 +189,8 @@ class Fetcher(object):
             except urllib2.HTTPError as e:
                 print('error fetching {}: {}'.format(archive, e))
 
-        return fetched_list
+        return [os.path.join(self.archive_dir, archive) for archive in
+                fetched_list]
 
     def get_fetched_archives(self):
         return [a.split('/')[-1] for a in
