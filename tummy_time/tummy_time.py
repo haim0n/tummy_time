@@ -5,7 +5,6 @@ from __future__ import print_function
 
 import argparse
 import gzip
-import string
 from datetime import datetime
 
 import data_utils
