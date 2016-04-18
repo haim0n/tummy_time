@@ -28,17 +28,31 @@ Getting Started
 ---------------
 Refer to the utility's help:::
 
-        usage: tummy_time.py [-h] [-Z] [-F] [-L] [-q QUERY [QUERY ...]] [-e]
+        usage: tummy_time.py [-h] [-Z] [-F] [-q QUERY [QUERY ...]] [-e]
+                             [--alias-create ALIAS_CREATE]
+                             [--alias-delete ALIAS_DELETE] [--alias-list]
+                             [-Q ALIAS_QUERY]
+
+        Food arrival stats
 
         optional arguments:
           -h, --help            show this help message and exit
           -Z, --init-db         purge all local data
           -F, --fetch-data      fetch data and populate local db with it
-          -L, --list-all-restaurants
-                                shows a list of restaurants from local db
           -q QUERY [QUERY ...], --query QUERY [QUERY ...]
-                                query the data for match
-          -e, --estimate-time   calculate estimated time arrival
+                                query the data for matching any of the supplied query
+                                strings. e.g -q burger pizza will return all entries
+                                matching 'burger' or 'pizza'
+          -e, --estimate-time   calculate estimated time arrival for the resulting
+                                query entries
+          --alias-create ALIAS_CREATE
+                                add query alias, use with -q switch. Use -q switch
+                                without this option to dry-run the query
+          --alias-delete ALIAS_DELETE
+                                delete query alias
+          --alias-list          list existing aliases
+          -Q ALIAS_QUERY, --alias-query ALIAS_QUERY
+                                run aliased query
 
 Examples
 --------
@@ -78,6 +92,24 @@ Examples
         Lunch from Najima has arrived 2016-03-23 12:44:38
         --------------------------------------------------
         estimation: 12:28:43
+
+* Create a 'pizzas' query alias::
+
+        $ ./tummy_time.py --alias-create pizzas -q dominos hut 'La Porchetta'
+        Lunch from Pizza hut has arrived 2016-03-17 12:12:07
+        Lunch from Pizza Hut has arrived 2016-03-22 12:33:15
+        Luch from Pizza hut and Zozobra has arrived 2016-03-30 12:47:27
+
+
+* Run a saved 'pizzas' query and get an ETA for it::
+
+        $ ./tummy_time.py -Q pizzas -e
+        Lunch from China Class has arrived 2016-03-10 12:55:34
+        Lunch from Pizza hut has arrived 2016-03-17 12:12:07
+        Lunch from Pizza Hut has arrived 2016-03-22 12:33:15
+        Luch from Pizza hut and Zozobra has arrived 2016-03-30 12:47:27
+        --------------------------------------------------
+        estimation: 12:41:43
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
