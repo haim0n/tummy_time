@@ -27,6 +27,13 @@ class Restaurant(Base):
     subject = sa.Column(sa.Unicode, nullable=False)
 
 
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.Unicode, nullable=False)
+    query_keywords = sa.Column(sa.Unicode, nullable=False)
+
+
 Base.metadata.create_all(_engine)
 
 
@@ -35,18 +42,11 @@ def purge_db():
     _metadata.drop_all()
 
 
-def update_food_arrivals_table(uid, date, data):
-    return None
-
-
-def filter_rest_subject(subject):
+def filter_restaurant_subject(subject):
+    # type: (subject) -> list
     session = Session()
     encoded_subjects = [unicode(s, 'utf8') for s in subject]
     conditions = [Restaurant.subject.contains(s) for s in encoded_subjects]
 
     return session.query(Restaurant).filter(or_(*conditions)).order_by(
         asc(Restaurant.arrival_time)).all()
-
-
-def list_all_subjects():
-    pass

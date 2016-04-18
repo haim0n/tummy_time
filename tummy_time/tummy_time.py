@@ -65,16 +65,8 @@ def output_to_file(f, db):
     db.dump_food_arrivals_to_file(f)
 
 
-def list_all_restaurants():
-    res = db_api.list_all_subjects()
-    for r in res:
-        print(r.subject)
-
-    return res
-
-
 def query_restaurants(query):
-    res = db_api.filter_rest_subject(query)
+    res = db_api.filter_restaurant_subject(query)
     for r in res:
         print(r.subject, r.arrival_time)
 
@@ -98,9 +90,6 @@ def main():
         populate_food_arrivals_data()
 
     results = []
-    if args.list_all_restaurants:
-        results = list_all_restaurants()
-
     if args.query:
         results = query_restaurants(args.query)
 
