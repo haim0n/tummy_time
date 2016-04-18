@@ -136,13 +136,14 @@ def main():
     if args.fetch_data:
         populate_food_arrivals_data()
 
-    if args.alias_list:
-        dump_aliases()
-        return
     try:
         validate_arguments(args)
     except ValueError as e:
         print(e)
+        return
+
+    if args.alias_list:
+        dump_aliases()
         return
 
     if args.alias_delete:
