@@ -116,6 +116,11 @@ def validate_arguments(args):
         raise ValueError(
             'invalid args: --alias-query and --query are mutual exclusive')
 
+    if args.alias_delete:
+        if any([args.alias_list, args.alias_query, args.alias_create]):
+            raise ValueError(
+                'invalid args: --alias-delete cannot be used with any option')
+
 
 def main():
     args = get_args()
@@ -135,15 +140,15 @@ def main():
         print(e)
         return
 
+    if args.alias_delete:
+        delete_query_alias(args.alias_delete)
+        return
+
     if args.alias_query:
         query = db_api.alias_query_get(args.alias_query)
         if not query:
             return
         args.query = query.query_keywords.split()
-
-    if args.alias_delete:
-        delete_query_alias(args.alias_delete)
-        return
 
     results = []
     if args.query:
