@@ -56,12 +56,6 @@ Refer to the utility's help:::
 
 Examples
 --------
-* Initialize (purge your local db)::
-
-        $ tummy_time/tummy_time -Z
-        $ initializing DB
-
-
 * Fetch messages and populate local db::
 
         $ tummy_time/tummy_time -F
@@ -111,7 +105,8 @@ Examples
         --------------------------------------------------
         estimation: 12:41:43
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+* List all existing aliases::
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+         $ ./tummy_time.py --alias-list
+         pizzas: dominos hut La Porchetta
+
