@@ -116,6 +116,7 @@ def validate_arguments(args):
         raise ValueError(
             'invalid args: --alias-query and --query are mutual exclusive')
 
+
 def main():
     args = get_args()
 
@@ -135,7 +136,7 @@ def main():
         return
 
     if args.alias_query:
-        query = db_api.get_alias_query(args.alias_query)
+        query = db_api.alias_query_get(args.alias_query)
         if not query:
             return
         args.query = query.query_keywords.split()
@@ -149,7 +150,6 @@ def main():
         results = query_restaurants(args.query)
         if args.alias_create:
             create_query_alias(args.alias_create, args.query)
-
 
     if args.estimate_time and results:
         dump_restaurant_stats(results)

@@ -78,7 +78,7 @@ def alias_list_all():
     return Session().query(Alias).all()
 
 
-def get_alias_query(alias_name):
+def alias_query_get(alias_name):
     alias_name = unicode(alias_name, 'utf8')
 
     return _alias_list(alias_name, Session())
