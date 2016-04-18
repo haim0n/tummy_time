@@ -4,8 +4,9 @@
 from __future__ import print_function
 
 import argparse
-from datetime import datetime
 import gzip
+import sys
+from datetime import datetime
 
 import data_utils
 import db_api
@@ -48,6 +49,10 @@ def get_args():
 
     arg_parser.add_argument('-Q', '--alias-query', action='store',
                             default=False, help='run aliased query')
+
+    if len(sys.argv) == 1:
+        arg_parser.print_help()
+        sys.exit(1)
 
     return arg_parser.parse_args()
 
