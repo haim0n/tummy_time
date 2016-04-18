@@ -4,8 +4,8 @@
 from __future__ import print_function
 
 import argparse
-from datetime import datetime
 import gzip
+from datetime import datetime
 
 import data_utils
 import db_api
@@ -23,10 +23,6 @@ def get_args():
     arg_parser.add_argument('-F', '--fetch-data', action='store_true',
                             default=False,
                             help='fetch data and populate local db with it')
-
-    arg_parser.add_argument('-L', '--list-all-restaurants',
-                            action='store_true',
-                            help='shows a list of restaurants from local db')
 
     arg_parser.add_argument('-q', '--query', action='store', nargs='+',
                             help='query the data for match')
