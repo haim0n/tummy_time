@@ -41,13 +41,10 @@ def update_food_arrivals_table(uid, date, data):
 
 def filter_rest_subject(subject):
     session = Session()
-    enc_subj = [unicode(s, 'utf8') for s in subject]
-    conditions = []
-    for term in enc_subj:
-        conditions.append(Restaurant.subject.contains(term))
-    condition = or_(*conditions)
+    encoded_subjects = [unicode(s, 'utf8') for s in subject]
+    conditions = [Restaurant.subject.contains(s) for s in encoded_subjects]
 
-    return session.query(Restaurant).filter(condition).order_by(
+    return session.query(Restaurant).filter(or_(*conditions)).order_by(
         asc(Restaurant.arrival_time)).all()
 
 
