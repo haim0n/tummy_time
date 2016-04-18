@@ -26,20 +26,19 @@ Installation
 
 Getting Started
 ---------------
-Refer to the utility's help:
+Refer to the utility's help:::
 
-usage: tummy_time.py \[-h\] \[-Z] \[-F] \[-L] \[-q QUERY \[QUERY ...\]\] \[-e\]
+        usage: tummy_time.py [-h] [-Z] [-F] [-L] [-q QUERY [QUERY ...]] [-e]
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -Z, --init-db         purge all local data
-  -F, --fetch-data      fetch data and populate local db with it
-  -L, --list-all-restaurants
-                        shows a list of restaurants from local db
-  -q QUERY [QUERY ...], --query QUERY [QUERY ...]
-                        query the data for match
-  -e, --estimate-time   calculate estimated time arrival
-
+        optional arguments:
+          -h, --help            show this help message and exit
+          -Z, --init-db         purge all local data
+          -F, --fetch-data      fetch data and populate local db with it
+          -L, --list-all-restaurants
+                                shows a list of restaurants from local db
+          -q QUERY [QUERY ...], --query QUERY [QUERY ...]
+                                query the data for match
+          -e, --estimate-time   calculate estimated time arrival
 
 Examples
 --------
