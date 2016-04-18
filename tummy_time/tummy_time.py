@@ -25,11 +25,29 @@ def get_args():
                             help='fetch data and populate local db with it')
 
     arg_parser.add_argument('-q', '--query', action='store', nargs='+',
-                            help='query the data for match')
+                            help='query the data for matching any of the '
+                                 'supplied query strings. e.g -q burger pizza '
+                                 'will return all entries matching \'burger\' '
+                                 'or \'pizza\'')
 
     arg_parser.add_argument('-e', '--estimate-time',
                             action='store_true', default=False,
-                            help='calculate estimated time arrival')
+                            help='calculate estimated time arrival for the '
+                                 'resulting query entries')
+
+    arg_parser.add_argument('--alias-create', action='store',
+                            help='add query alias, use with -q switch. Use -q '
+                                 'switch without this option to dry-run the '
+                                 'query')
+
+    arg_parser.add_argument('--alias-delete', action='store',
+                            help='delete query alias')
+
+    arg_parser.add_argument('--alias-list', action='store_true',
+                            default=False, help='list existing aliases')
+
+    arg_parser.add_argument('-Q', '--alias-query', action='store',
+                            default=False, help='run aliased query')
 
     return arg_parser.parse_args()
 
@@ -80,6 +98,24 @@ def dump_restaurant_stats(restaurants):
         print('estimation: {}'.format(data_utils.calc_ema(times_list)))
 
 
+def create_query_alias(alias_name, query):
+    db_api.alias_create(alias_name, query)
+
+
+def delete_query_alias(alias_name):
+    db_api.alias_delete(alias_name)
+
+
+def dump_aliases():
+    for a in db_api.alias_list_all():
+        print(u'{}: {}'.format(a.name, a.query_keywords))
+
+
+def validate_arguments(args):
+    if args.query and args.alias_query:
+        raise ValueError(
+            'invalid args: --alias-query and --query are mutual exclusive')
+
 def main():
     args = get_args()
 
@@ -89,9 +125,31 @@ def main():
     if args.fetch_data:
         populate_food_arrivals_data()
 
+    if args.alias_list:
+        dump_aliases()
+        return
+    try:
+        validate_arguments(args)
+    except ValueError as e:
+        print(e)
+        return
+
+    if args.alias_query:
+        query = db_api.get_alias_query(args.alias_query)
+        if not query:
+            return
+        args.query = query.query_keywords.split()
+
+    if args.alias_delete:
+        delete_query_alias(args.alias_delete)
+        return
+
     results = []
     if args.query:
         results = query_restaurants(args.query)
+        if args.alias_create:
+            create_query_alias(args.alias_create, args.query)
+
 
     if args.estimate_time and results:
         dump_restaurant_stats(results)
