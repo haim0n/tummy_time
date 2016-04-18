@@ -38,10 +38,11 @@ def update_food_arrivals_table(uid, date, data):
     return None
 
 
-def filter_rest_subject(subj):
+def filter_rest_subject(subject):
     session = Session()
+    enc_subj = unicode(subject, 'utf8')
     return session.query(Restaurant).filter(
-        Restaurant.subject.contains(subj)).order_by(
+        Restaurant.subject.contains(enc_subj)).order_by(
         asc(Restaurant.arrival_time)).all()
 
 

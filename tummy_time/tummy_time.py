@@ -28,8 +28,12 @@ def get_args():
                             action='store_true',
                             help='shows a list of restaurants from local db')
 
-    arg_parser.add_argument('-q', '--query', dest='query')
-    arg_parser.add_argument('-d', '--dump-restaurant-stats')
+    arg_parser.add_argument('-q', '--query', dest='query',
+                            help='query the data for match')
+
+    arg_parser.add_argument('-d', '--dump-restaurant-stats',
+                            action='store_true', default=False,
+                            help='calculate estimated time arrival')
 
     return arg_parser.parse_args()
 
@@ -66,25 +70,26 @@ def output_to_file(f, db):
 
 
 def list_all_restaurants():
-    for r in db_api.list_all_subjects():
+    res = db_api.list_all_subjects()
+    for r in res:
         print(r.subject)
+
+    return res
 
 
 def query_restaurants(query):
-    enc = unicode(query, 'utf8')
-    for r in db_api.filter_rest_subject(enc):
+    res = db_api.filter_rest_subject(query)
+    for r in res:
         print(r.subject, r.arrival_time)
 
+    return res
 
-def dump_restaurant_stats(db, rest_name):
-    str_times_list = []
-    for dct in db.get_restaurant_data(rest_name):
-        print(db.dump_rest_dct_to_csv(dct))
-        str_times_list.append(dct['date'].split()[-1])
 
+def dump_restaurant_stats(restaurants):
+    times_list = [r.arrival_time for r in restaurants]
     print('-' * 50)
-    if str_times_list:
-        print('estimation: {}'.format(data_utils.calc_ema(str_times_list)))
+    if times_list:
+        print('estimation: {}'.format(data_utils.calc_ema(times_list)))
 
 
 def main():
@@ -96,11 +101,16 @@ def main():
     if args.fetch_data:
         populate_food_arrivals_data()
 
+    results = []
     if args.list_all_restaurants:
-        list_all_restaurants()
+        results = list_all_restaurants()
 
     if args.query:
-        query_restaurants(args.query)
+        results = query_restaurants(args.query)
+
+    if args.dump_restaurant_stats and results:
+        dump_restaurant_stats(results)
+
 
 if __name__ == '__main__':
     main()

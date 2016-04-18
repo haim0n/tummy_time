@@ -23,10 +23,8 @@ _script_location = os.path.realpath(
 EWA_ALPHA = 0.7
 
 
-def time_str_to_seconds(time_str):
-    t_hr, t_min, t_sec = map(int, time_str.split(':'))
-
-    return t_hr * 3600 + t_min * 60 + t_sec
+def time_to_seconds(t):
+    return t.hour * 3600 + t.minute * 60 + t.second
 
 
 def calc_ema(time_list, alpha=EWA_ALPHA):
@@ -49,10 +47,10 @@ def calc_ema(time_list, alpha=EWA_ALPHA):
     if not time_list:
         return None
 
-    st_list = [time_str_to_seconds(time_list[0])]
+    st_list = [time_to_seconds(time_list[0])]
     st = st_list[0]
     for d in time_list[1:]:
-        yt = time_str_to_seconds(d)
+        yt = time_to_seconds(d)
         st = alpha * yt + (1 - alpha) * st_list[-1]
         st_list.append(st)
 
