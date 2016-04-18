@@ -104,7 +104,8 @@ class TestParser(unittest.TestCase):
         pass
 
     def test_filter_messages(self):
-	pass
+        pass
+
 
 if __name__ == '__main__':
     import sys

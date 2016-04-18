@@ -1,17 +1,18 @@
 # coding=utf-8
 import calendar
 import email
+import glob
 import os
 import re
 import time
 import urllib2
-from datetime import time as dt
+
 from datetime import datetime
+from datetime import time as dt
 from datetime import timedelta
 
-import itertools
-import glob
 from email.header import decode_header
+import itertools
 
 import pytz
 
@@ -100,8 +101,9 @@ class Parser(object):
                         res.second) + res.tzinfo._utcoffset
 
     @classmethod
-    def _filter_messages(cls, text):
-        """
+    def _txt_to_messages(cls, text):
+        """Convert raw text data to email messages.
+
         :param text: str -> raw input string
         :returns: list -> email objects
         """
@@ -112,7 +114,7 @@ class Parser(object):
                 msg_texts]
 
     def parse(self, data):
-        msg_list = self._filter_messages(data)
+        msg_list = self._txt_to_messages(data)
         for msg in msg_list:
             msg_id = msg.get('Message-ID')
             tbl = db_api.Restaurant
@@ -140,7 +142,9 @@ class Fetcher(object):
             os.makedirs(self.archive_dir)
 
     def _get_all_archive_dates(self):
-        """:returns: set - set of tuples (year, month) each tuple representing
+        """Provides formatted archive dates.
+
+        :returns: set - set of tuples (year, month) each tuple representing
         archives dates.
         """
         start_month = self.first_archive_date.month
@@ -170,7 +174,9 @@ class Fetcher(object):
              self.archive_suffix])
 
     def _get_all_archive_names(self):
-        """:returns: list -> list of strings in the form of
+        """Provides formatted archive names.
+
+        :returns: list -> list of strings in the form of
         YYYY-mm.archive_suffix
         """
         return map(self._archive_name_from_date, self._get_all_archive_dates())
@@ -197,11 +203,13 @@ class Fetcher(object):
                 glob.glob(self.archive_dir + '/*' + self.archive_suffix)]
 
     def fetch(self):
-        """Fetches all available archives that don't exist locally from remote
-        url. The latest archive always gets downloaded for potentially holding
+        """Fetches all remote archives that don't exist locally.
+
+        The latest archive always gets downloaded for potentially holding
         new data.
 
-        :return list: -> list of downloaded archive file names"""
+        :return list: -> list of downloaded archive file names.
+        """
         today = datetime.now()
         latest_archive = self._archive_name_from_date(
             (today.year, today.month))

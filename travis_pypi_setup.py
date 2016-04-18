@@ -8,16 +8,18 @@ from __future__ import print_function
 import base64
 import json
 import os
+
 from getpass import getpass
 import yaml
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
 
 try:
     from urllib import urlopen
-except:
+except Exception:
     from urllib.request import urlopen
 
 
@@ -28,6 +30,7 @@ TRAVIS_CONFIG_FILE = os.path.join(
 
 def load_key(pubkey):
     """Load public RSA key, with work-around for keys using
+
     incorrect header/footer format.
 
     Read more about RSA encryption with cryptography:
@@ -67,8 +70,7 @@ def fetch_public_key(repo):
 
 
 def prepend_line(filepath, line):
-    """Rewrite a file adding a line to its beginning.
-    """
+    """Rewrite a file adding a line to its beginning."""
     with open(filepath) as f:
         lines = f.readlines()
 
@@ -89,8 +91,9 @@ def save_yaml_config(filepath, config):
 
 
 def update_travis_deploy_password(encrypted_password):
-    """Update the deploy section of the .travis.yml file
-    to use the given encrypted password.
+    """Update the deploy section of the .travis.yml file to use the given
+
+    encrypted password.
     """
     config = load_yaml_config(TRAVIS_CONFIG_FILE)
 

@@ -2,10 +2,10 @@
 import os
 
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import asc
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import or_
+from sqlalchemy.orm import sessionmaker
 
 _script_location = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
