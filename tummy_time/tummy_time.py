@@ -28,10 +28,10 @@ def get_args():
                             action='store_true',
                             help='shows a list of restaurants from local db')
 
-    arg_parser.add_argument('-q', '--query', dest='query',
+    arg_parser.add_argument('-q', '--query', action='store', nargs='+',
                             help='query the data for match')
 
-    arg_parser.add_argument('-d', '--dump-restaurant-stats',
+    arg_parser.add_argument('-e', '--estimate-time',
                             action='store_true', default=False,
                             help='calculate estimated time arrival')
 
@@ -108,7 +108,7 @@ def main():
     if args.query:
         results = query_restaurants(args.query)
 
-    if args.dump_restaurant_stats and results:
+    if args.estimate_time and results:
         dump_restaurant_stats(results)
 
 

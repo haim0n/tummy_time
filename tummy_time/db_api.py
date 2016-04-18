@@ -5,6 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import asc
+from sqlalchemy import or_
 
 _script_location = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -40,9 +41,13 @@ def update_food_arrivals_table(uid, date, data):
 
 def filter_rest_subject(subject):
     session = Session()
-    enc_subj = unicode(subject, 'utf8')
-    return session.query(Restaurant).filter(
-        Restaurant.subject.contains(enc_subj)).order_by(
+    enc_subj = [unicode(s, 'utf8') for s in subject]
+    conditions = []
+    for term in enc_subj:
+        conditions.append(Restaurant.subject.contains(term))
+    condition = or_(*conditions)
+
+    return session.query(Restaurant).filter(condition).order_by(
         asc(Restaurant.arrival_time)).all()
 
 
