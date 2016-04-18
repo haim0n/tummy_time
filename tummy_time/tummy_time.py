@@ -4,8 +4,8 @@
 from __future__ import print_function
 
 import argparse
-import gzip
 from datetime import datetime
+import gzip
 
 import data_utils
 import db_api
