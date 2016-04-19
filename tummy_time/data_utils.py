@@ -209,6 +209,7 @@ class Fetcher(object):
         new data.
 
         :return list: -> list of downloaded archive file names.
+        :raises: urllib2.URLError
         """
         today = datetime.now()
         latest_archive = self._archive_name_from_date(

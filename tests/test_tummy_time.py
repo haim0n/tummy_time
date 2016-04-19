@@ -103,7 +103,10 @@ class TestParser(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_filter_messages(self):
+    def test_txt_to_messages(self):
+        pass
+
+    def test_calc_ema(self):
         pass
 
 

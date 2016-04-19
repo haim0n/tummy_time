@@ -6,6 +6,7 @@ from __future__ import print_function
 import argparse
 import gzip
 import sys
+import urllib2
 from datetime import datetime
 
 import data_utils
@@ -67,7 +68,13 @@ def fetch_data():
     fetcher = data_utils.Fetcher(url=ARCHIVES_URL,
                                  first_archive_date=FIRST_ARCHIVE,
                                  archive_suffix=ARCHIVE_SUFFIX)
-    return fetcher.fetch()
+    ret = []
+    try:
+        ret = fetcher.fetch()
+    except urllib2.URLError as e:
+        print(e)
+    finally:
+        return ret
 
 
 def parse_data(archives):
@@ -119,28 +126,36 @@ def dump_aliases():
 def validate_arguments(args):
     if args.query and args.alias_query:
         raise ValueError(
-            'invalid args: --alias-query and --query are mutual exclusive')
+            'invalid args: --alias-query and --query are mutually exclusive')
 
     if args.alias_delete:
         if any([args.alias_list, args.alias_query, args.alias_create]):
             raise ValueError(
-                'invalid args: --alias-delete cannot be used with any option')
+                'invalid args: --alias-delete cannot be used with any alias'
+                'options')
+
+    if args.alias_create:
+        if any([args.alias_list, args.alias_query, args.alias_delete]):
+            raise ValueError(
+                'invalid args: --alias-create cannot be used with any alias'
+                'options')
+        if not args.query:
+            raise ValueError('invalid args: use -q to provide the query')
 
 
 def main():
     args = get_args()
+    try:
+        validate_arguments(args)
+    except ValueError as e:
+        print(e)
+        return
 
     if args.init_db:
         db_api.purge_db()
 
     if args.fetch_data:
         populate_food_arrivals_data()
-
-    try:
-        validate_arguments(args)
-    except ValueError as e:
-        print(e)
-        return
 
     if args.alias_list:
         dump_aliases()
