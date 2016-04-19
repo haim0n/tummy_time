@@ -14,7 +14,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'sqlalchemy', 'freezegun', 'mock',
+    'sqlalchemy', 'freezegun', 'mock', 'pytz', 'appdirs',
     # TODO(haim0n): put package requirements here
 ]
 
@@ -54,5 +54,10 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=test_requirements,
+    entry_points={
+        'console_scripts': [
+            'tummy_time = tummy_time.__main__:main'
+        ]
+    }
 )

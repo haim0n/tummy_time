@@ -14,21 +14,17 @@ from datetime import timedelta
 from email.header import decode_header
 import itertools
 
+import constants
 import pytz
 
 from tummy_time import db_api
-
-_script_location = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-EWA_ALPHA = 0.7
 
 
 def time_to_seconds(t):
     return t.hour * 3600 + t.minute * 60 + t.second
 
 
-def calc_ema(time_list, alpha=EWA_ALPHA):
+def calc_ema(time_list, alpha=constants.EWA_ALPHA):
     """Calculates Exponential Moving Average for given time series.
 
     An exponential moving average (EMA), aka an exponentially
@@ -133,7 +129,7 @@ class Parser(object):
 
 class Fetcher(object):
     def __init__(self, url, first_archive_date, archive_suffix,
-                 archive_dir=os.path.join(_script_location, 'archives')):
+                 archive_dir=os.path.join(constants.DATA_DIR, 'archives')):
         self.url = url
         self.first_archive_date = first_archive_date
         self.archive_suffix = archive_suffix

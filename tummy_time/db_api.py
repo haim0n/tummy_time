@@ -7,10 +7,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 
-_script_location = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+import constants
 
-DB_FILE = os.path.join(_script_location, 'data.db')
+DB_FILE = os.path.join(constants.DATA_DIR, 'data.db')
+if not os.path.exists(constants.DATA_DIR):
+    os.makedirs(constants.DATA_DIR)
 
 _engine = sa.create_engine('sqlite:///{}'.format(DB_FILE))
 Session = sessionmaker(bind=_engine)

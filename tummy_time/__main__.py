@@ -7,14 +7,10 @@ import argparse
 import gzip
 import sys
 import urllib2
-from datetime import datetime
 
+import constants
 import data_utils
 import db_api
-
-ARCHIVES_URL = 'http://post-office.corp.redhat.com/archives/tlv-food-arrivals/'
-FIRST_ARCHIVE = datetime(2010, 11, 1)
-ARCHIVE_SUFFIX = '.txt.gz'
 
 
 def get_args():
@@ -65,9 +61,9 @@ def init_db():
 
 def fetch_data():
     print('fetching data')
-    fetcher = data_utils.Fetcher(url=ARCHIVES_URL,
-                                 first_archive_date=FIRST_ARCHIVE,
-                                 archive_suffix=ARCHIVE_SUFFIX)
+    fetcher = data_utils.Fetcher(url=constants.ARCHIVES_URL,
+                                 first_archive_date=constants.FIRST_ARCHIVE,
+                                 archive_suffix=constants.ARCHIVE_SUFFIX)
     ret = []
     try:
         ret = fetcher.fetch()

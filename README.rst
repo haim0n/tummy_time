@@ -9,8 +9,8 @@ Food delivery time analyser - say goodbye to guessing when's your next food deli
 Installation
 ------------
 * Clone the repo: ``git clone git@github.com:haim0n/tummy_time.git``
-* Install pip: ``sudo yum install -y python-pip``
-* Install all requirements: ``sudo pip install -r tummy_time/requirements.txt``
+* Install pip: ``sudo dnf install -y python-pip``
+* Install all requirements: ``sudo python setup.py install``
 
 
 Getting Started
