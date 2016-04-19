@@ -10,7 +10,7 @@ Installation
 ------------
 * Clone the repo: ``git clone git@github.com:haim0n/tummy_time.git``
 * Install pip: ``sudo dnf install -y python-pip``
-* Install all requirements: ``sudo python setup.py install``
+* Install the package: ``sudo python setup.py install``
 
 
 Getting Started
@@ -47,7 +47,7 @@ Examples
 --------
 * Fetch messages and populate local db::
 
-        $ tummy_time/tummy_time -F
+        $ tummy_time -F
         fetching data
         added <2065160673.9607557.1398934680559.JavaMail.zimbra@redhat.com> 2014-05-01 11:58:00
         added <1553776994.56788.1399194968464.JavaMail.zimbra@redhat.com> 2014-05-04 12:16:08
@@ -60,7 +60,7 @@ Examples
 
 * Dump stats of a single restaurant and get an ETA::
 
-        $ ./tummy_time/tummy_time -q najima 'nagima' -e
+        $ tummy_time -q najima nagima -e
         lunch from ludens, Ahuzat Hahumous, Najima has arrived 2016-01-20 12:20:43
         Lunch from Baharat and Najima has arrived 2016-01-25 12:23:08
         Lunch from Najima and Shnitzels has arrived 2016-01-31 13:12:30
@@ -78,7 +78,7 @@ Examples
 
 * Create a 'pizzas' query alias::
 
-        $ ./tummy_time.py --alias-create pizzas -q dominos hut 'La Porchetta'
+        $ tummy_time.py --alias-create pizzas -q dominos hut 'La Porchetta'
         Lunch from Pizza hut has arrived 2016-03-17 12:12:07
         Lunch from Pizza Hut has arrived 2016-03-22 12:33:15
         Luch from Pizza hut and Zozobra has arrived 2016-03-30 12:47:27
@@ -86,7 +86,7 @@ Examples
 
 * Run a saved 'pizzas' query and get an ETA for it::
 
-        $ ./tummy_time.py -Q pizzas -e
+        $ tummy_time.py -Q pizzas -e
         Lunch from China Class has arrived 2016-03-10 12:55:34
         Lunch from Pizza hut has arrived 2016-03-17 12:12:07
         Lunch from Pizza Hut has arrived 2016-03-22 12:33:15
@@ -96,6 +96,6 @@ Examples
 
 * List all existing aliases::
 
-         $ ./tummy_time.py --alias-list
+         $ tummy_time.py --alias-list
          pizzas: dominos hut La Porchetta
 
